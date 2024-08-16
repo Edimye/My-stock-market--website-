@@ -1,1 +1,5 @@
-
+- **Tag Version**: `v1.0`
+- **Target Branch**: `main`
+- **Release Title**: "Initial Release"
+- **Release Description**: "This is the first version of the Stock Market Basics Website."
+- 
