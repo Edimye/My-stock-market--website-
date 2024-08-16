@@ -1,0 +1,74 @@
+const apiKey = 'YOUR_ALPHA_VANTAGE_API_KEY'; // Replace with your API Key
+const symbol = 'AAPL'; // Stock symbol (e.g., AAPL for Apple)
+
+async function fetchStockData() {
+    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=${apiKey}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Extract time series data
+    const timeSeries = data['Time Series (5min)'];
+    const labels = Object.keys(timeSeries).reverse(); // Time labels
+    const stockPrices = Object.values(timeSeries).map(entry => entry['1. open']).reverse(); // Stock prices
+
+    return { labels, stockPrices };
+}
+
+function renderChart(labels, stockPrices) {
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `Stock Prices (${symbol})`,
+                data: stockPrices,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Time',
+                        color: '#333',
+                        font: {
+                            family: 'Arial',
+                            size: 14,
+                            weight: 'bold',
+                            lineHeight: 1.2,
+                        },
+                        padding: { top: 20, left: 0, right: 0, bottom: 0 }
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Stock Price (USD)',
+                        color: '#333',
+                        font: {
+                            family: 'Arial',
+                            size: 14,
+                            style: 'normal',
+                            lineHeight: 1.2
+                        },
+                        padding: { top: 30, left: 0, right: 0, bottom: 0 }
+                    }
+                }
+            }
+        }
+    });
+}
+
+async function initializeChart() {
+    const { labels, stockPrices } = await fetchStockData();
+    renderChart(labels, stockPrices);
+}
+
+// Initialize the chart when the page loads
+window.onload = initializeChart;
